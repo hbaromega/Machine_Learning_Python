@@ -1,0 +1,83 @@
+import tensorflow as tf
+import numpy as np
+from tensorflow import keras
+import matplotlib.pyplot as plt
+
+
+# Define a neural network (NN): a single unit NN in our case
+model = keras.Sequential([keras.layers.Dense(units=1, input_shape=[1])])
+                              # Note units=1 here (implies single layer)
+			      #      input_xhape = [1] => single valued input
+
+# Define a model to fit
+model.compile(optimizer='sgd', loss='mean_squared_error', metrics=['accuracy'])
+            # Optimizer tries to find a relation between 
+              #  input (X) and output data (Y)
+              # SGD => Stochastic gradient descent  
+	      # loss => error from the correct value
+
+# Provide data: X & Y train data sets
+xtrain = np.array([-1.0, 0.0, 1.0, 2.0, 3.0, 4.0], dtype=float)
+ytrain = np.array([-2.0, 1.0, 4.5, 6.8, 8.0, 15.0], dtype=float)
+
+# Learning: Fit the data points with our models
+history = model.fit(xtrain, ytrain, validation_split=0.1, epochs=500, batch_size=10, verbose=0) # epoch => number of iteration
+
+print()
+print('Machine has learnt!!')
+print(history.history.keys())
+print()
+#exit()
+
+Xtest = [-15,-12,-5,-0.2,1,2,5,10,15,20]
+
+# Predicting Y for Xtest 
+Ypred = model.predict(Xtest)
+print('X set =',Xtest)
+print('Y set =',Ypred)
+ 
+# Exact formula Y = 3X +1  
+
+Xexact = np.linspace(-20,20,100)
+Yexact =  3*Xexact +1 
+
+plt.plot(xtrain,ytrain,'ro',label='Train')
+plt.plot(Xtest,Ypred,'g*',label='Test')
+plt.plot(Xexact,Yexact,label='Exact: $y = 3x + 1$')
+plt.ylabel('y')
+plt.xlabel('x')
+plt.legend(loc='best')
+plt.savefig('ML_regression.png')
+plt.show()
+
+mse = 0.0
+N = len(Ypred)
+for i in range(N):
+       ytrue = 3*Xtest[i] + 1
+       mse = (ytrue-Ypred[i])**2   
+mse = mse/N
+print('Loss in test =',mse)
+
+# summarize history for accuracy
+plt.plot(history.history['accuracy'],'ro', ms=4)
+#plt.plot(history.history['val_accuracy'],'b*',ms=4)
+plt.title('model accuracy')
+plt.ylabel('accuracy')
+plt.xlabel('epoch')
+plt.legend(['train', 'validation'], loc='upper right')
+plt.savefig('ML_regression_accuracy.png')
+plt.show()
+
+# summarize history for loss
+plt.plot(history.history['loss'],'ro',ms=4)
+#plt.plot(history.history['val_loss'],'b*',ms=4)
+plt.title('Model loss')
+plt.ylabel('Loss')
+plt.xlabel('Epoch')
+plt.legend(['train', 'validation'], loc='upper right')
+plt.savefig('ML_regression_loss_vs_epoch.png')
+plt.show()
+
+
+
+
